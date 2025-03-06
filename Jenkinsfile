@@ -11,7 +11,7 @@ pipeline {
             sh 'echo "test"'
         }
     }
-    stage*('createfile'){
+    stage*('ceatefile'){
         steps{
             sh 'touch text-$BUILD_ID'
         }
