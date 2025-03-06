@@ -1,49 +1,20 @@
 pipeline {
-   agent any
-
- environment{
-        AWS_REGION = 'us-east-1'
-        IMAGE_ECR_REPO  = '288761740567.dkr.ecr.us-east-1.amazonaws.com/jenkins-ci'
-        ECR_REPO = 288761740567.dkr.ecr.us-east-1.amazonaws.com
- }
-
-     Stages{
-        stage('CodeScan'){
+  agent any
+  stages{
+    stage('clone'){
         steps{
-            sh 'trivy fs .  -o result.html'
-            sh 'cat result.html'
-           
+        sh 'echo' "clone"
         }
     }
-    stage('dockerLogin'){
+    stage('test'){
         steps{
-            sh 'aws ecr get-login-password --region $AWS_REGION | \
-            docker login --username AWS \
-            --password-stdin 288761740567.dkr.ecr.us-east-1.amazonaws.com'
+            sh 'echo "test"'
         }
     }
-    stage('dockerImageBuild'){
+    stage*('createfile'){
         steps{
-            sh 'docker build -t jenkins-ci .'
-            sh 'docker build -t imageversion . '
+            sh 'touch text-$BUILD_ID'
         }
+    }
+  }
 }
-    stage('dockerImageTag'){
-        steps{
-            sh 'docker tag jenkins-ci:latest\
-             288761740567.dkr.ecr.us-east-1.amazonaws.com/jenkins-ci:latest'
-            sh 'docker tag imageversion \
-           $IMAGE_ECR_REPO:v1.$BUILD_NUMBER'
-        }    
-        }
-    
-    stage('pushImage'){
-        steps{
-            sh 'docker push \
-            288761740567.dkr.ecr.us-east-1.amazonaws.com/jenkins-ci:latest'
-            sh 'docker push \
-            288761740567.dkr.ecr.us-east-1.amazonaws.com/jenkins-ci:v1.$BUILD_NUMBER'
-        }
-    }
-   } 
-   }
